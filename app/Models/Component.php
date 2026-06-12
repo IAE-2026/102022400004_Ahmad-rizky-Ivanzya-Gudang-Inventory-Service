@@ -12,5 +12,6 @@ class Component extends Model
         'stock',
         'minimum_stock',
         'unit',
+        'receipt_number',
     ];
 }

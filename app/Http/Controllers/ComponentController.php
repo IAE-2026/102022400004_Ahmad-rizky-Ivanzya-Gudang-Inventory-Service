@@ -3,7 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Component;
+use App\Models\User;
+use App\Services\RabbitMQService;
+use Firebase\JWT\JWT;
+use Firebase\JWT\JWK;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
 
 #[OA\Info(
@@ -16,6 +24,12 @@ use OpenApi\Attributes as OA;
     type: "apiKey",
     in: "header",
     name: "X-IAE-KEY"
+)]
+#[OA\SecurityScheme(
+    securityScheme: "BearerAuth",
+    type: "http",
+    scheme: "bearer",
+    bearerFormat: "JWT"
 )]
 class ComponentController extends Controller
 {
@@ -179,7 +193,7 @@ class ComponentController extends Controller
         path: "/api/v1/components/receive",
         summary: "Receive component stock",
         tags: ["Components"],
-        security: [["ApiKeyAuth" => []]]
+        security: [["BearerAuth" => []]]
     )]
     #[OA\RequestBody(
         required: true,
@@ -276,28 +290,165 @@ class ComponentController extends Controller
     )]
     public function receive(Request $request)
     {
+        $authHeader = $request->header('Authorization');
+        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized. Bearer token is missing.',
+                'errors' => null
+            ], 401);
+        }
+
+        $token = substr($authHeader, 7);
+
+        try {
+            $jwks = Cache::remember('sso_jwks', 3600, function () {
+                $response = Http::withoutVerifying()->get('https://iae-sso.virtualfri.id/api/v1/auth/jwks');
+                if ($response->failed()) {
+                    throw new \Exception("Failed to fetch JWKS from SSO server.");
+                }
+                return $response->json();
+            });
+
+            $keys = JWK::parseKeySet($jwks);
+            $decoded = JWT::decode($token, $keys);
+
+        } catch (\Exception $e) {
+            Log::error('JWT Verification failed: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized. Invalid or expired token.',
+                'errors' => $e->getMessage()
+            ], 401);
+        }
+
+        $email = $decoded->email ?? $decoded->sub ?? null;
+        if (!$email) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized. Email claim not found in token.',
+                'errors' => null
+            ], 401);
+        }
+
+        $user = User::with('role')->where('email', $email)->first();
+        if (!$user || !$user->role || !in_array($user->role->name, ['gudang', 'admin'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Forbidden. User does not have access to inventory operations.',
+                'errors' => null
+            ], 403);
+        }
+
         $validated = $request->validate([
             'part_number' => 'required|string',
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $component = Component::where('part_number', $validated['part_number'])->first();
+        $receiptNumber = null;
+        $soapResponseBody = '';
+        try {
+            $soapUrl = 'https://iae-sso.virtualfri.id/soap/v1/audit';
 
-        if (!$component) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Component with that part_number not found',
-                'errors' => null
-            ], 404);
+            // Fetch M2M Token for SOAP Audit (SSO server requires M2M token for SOAP Audit and RabbitMQ bridge)
+            $m2mToken = null;
+            try {
+                $tokenResponse = Http::withoutVerifying()->post('https://iae-sso.virtualfri.id/api/v1/auth/token', [
+                    'api_key' => env('IAE_API_KEY', 'KEY-MHS-30')
+                ]);
+                if ($tokenResponse->successful()) {
+                    $m2mToken = $tokenResponse->json('token');
+                }
+            } catch (\Exception $e) {
+                Log::error("Failed to fetch M2M Token: " . $e->getMessage());
+            }
+
+            $xmlPayload = '<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:iae="http://iae.central/audit">
+    <soap:Body>
+        <iae:AuditRequest>
+            <iae:TeamID>' . env('IAE_TEAM_ID', 'TEAM-03') . '</iae:TeamID>
+            <iae:ActivityName>ReceiveComponentStock</iae:ActivityName>
+            <iae:LogContent><![CDATA[' . json_encode([
+                'part_number' => $validated['part_number'],
+                'quantity' => $validated['quantity']
+            ]) . ']]></iae:LogContent>
+        </iae:AuditRequest>
+    </soap:Body>
+</soap:Envelope>';
+
+            $soapResponse = Http::withoutVerifying()
+                ->withHeaders([
+                    'Content-Type' => 'text/xml; charset=utf-8',
+                    'Authorization' => 'Bearer ' . ($m2mToken ?? $token),
+                ])
+                ->withBody($xmlPayload, 'text/xml')
+                ->post($soapUrl);
+
+            $soapResponseBody = $soapResponse->body();
+            
+            if (preg_match('/<iae:ReceiptNumber>(.*?)<\/iae:ReceiptNumber>/i', $soapResponseBody, $matches)) {
+                $receiptNumber = $matches[1];
+            } elseif (preg_match('/<ReceiptNumber>(.*?)<\/ReceiptNumber>/i', $soapResponseBody, $matches)) {
+                $receiptNumber = $matches[1];
+            }
+
+            if (!$receiptNumber) {
+                Log::warning("SOAP Audit Response did not return a ReceiptNumber: " . $soapResponseBody);
+            }
+        } catch (\Exception $e) {
+            Log::error('SOAP Audit failed: ' . $e->getMessage());
         }
 
-        $component->stock += $validated['quantity'];
-        $component->save();
+        try {
+            DB::beginTransaction();
+
+            $component = Component::where('part_number', $validated['part_number'])
+                ->lockForUpdate()
+                ->first();
+
+            if (!$component) {
+                DB::rollBack();
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Component with that part_number not found',
+                    'errors' => null
+                ], 404);
+            }
+
+            $component->stock += $validated['quantity'];
+            if ($receiptNumber) {
+                $component->receipt_number = $receiptNumber;
+            }
+            $component->save();
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database transaction failed: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Internal server error while updating component stock.',
+                'errors' => $e->getMessage()
+            ], 500);
+        }
+
+        $rabbitmqService = new RabbitMQService();
+        $routingKey = 'component.received';
+        $rabbitmqService->publish($routingKey, [
+            'part_number' => $component->part_number,
+            'quantity' => $validated['quantity'],
+            'new_stock' => $component->stock,
+            'receipt_number' => $receiptNumber
+        ], $m2mToken ?? $token);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Stock updated successfully',
-            'data' => $component,
+            'data' => [
+                'component' => $component,
+                'receipt_number' => $receiptNumber
+            ],
             'meta' => [
                 'service_name' => 'Inventory-Service',
                 'api_version' => 'v1'

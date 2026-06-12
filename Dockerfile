@@ -2,7 +2,7 @@ FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
     git unzip curl libzip-dev zip \
-    && docker-php-ext-install zip pdo pdo_mysql
+    && docker-php-ext-install zip pdo pdo_mysql bcmath
 
 RUN a2enmod rewrite
 

@@ -13,15 +13,13 @@ class ComponentSeeder extends Seeder
      */
     public function run(): void
     {
-        Component::insert([
+        $components = [
             [
                 'name'          => 'IC Mikrokontroler ATmega328',
                 'part_number'   => 'IC-001',
                 'stock'         => 50,
                 'minimum_stock' => 10,
                 'unit'          => 'pcs',
-                'created_at'    => now(),
-                'updated_at'    => now(),
             ],
             [
                 'name'          => 'Resistor 10K Ohm',
@@ -29,8 +27,6 @@ class ComponentSeeder extends Seeder
                 'stock'         => 200,
                 'minimum_stock' => 50,
                 'unit'          => 'pcs',
-                'created_at'    => now(),
-                'updated_at'    => now(),
             ],
             [
                 'name'          => 'Kapasitor 100uF',
@@ -38,9 +34,14 @@ class ComponentSeeder extends Seeder
                 'stock'         => 150,
                 'minimum_stock' => 30,
                 'unit'          => 'pcs',
-                'created_at'    => now(),
-                'updated_at'    => now(),
             ],
-        ]);
+        ];
+
+        foreach ($components as $component) {
+            Component::updateOrCreate(
+                ['part_number' => $component['part_number']],
+                $component
+            );
+        }
     }
 }

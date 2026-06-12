@@ -454,7 +454,7 @@
                 },
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ]
             }
@@ -466,6 +466,11 @@
                 "type": "apiKey",
                 "name": "X-IAE-KEY",
                 "in": "header"
+            },
+            "BearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     },

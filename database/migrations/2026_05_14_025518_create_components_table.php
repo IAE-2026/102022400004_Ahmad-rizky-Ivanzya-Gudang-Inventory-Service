@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('stock');      
             $table->integer('minimum_stock'); 
             $table->string('unit');         
+            $table->string('receipt_number')->nullable();
             $table->timestamps();
         });
     }

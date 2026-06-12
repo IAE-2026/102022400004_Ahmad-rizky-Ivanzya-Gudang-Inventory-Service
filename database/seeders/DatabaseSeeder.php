@@ -17,9 +17,25 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(ComponentSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Seed Roles
+        $gudangRole = \App\Models\Role::firstOrCreate(
+            ['name' => 'gudang'],
+            ['description' => 'Staff Gudang / Inventory']
+        );
+
+        \App\Models\Role::firstOrCreate(
+            ['name' => 'admin'],
+            ['description' => 'Administrator']
+        );
+
+        // Seed simulation user from SSO credentials
+        User::updateOrCreate(
+            ['email' => 'warga16@ktp.iae.id'],
+            [
+                'name' => 'Warga 16 (Staff Gudang)',
+                'password' => bcrypt('KtpDigital2026!'),
+                'role_id' => $gudangRole->id,
+            ]
+        );
     }
 }
