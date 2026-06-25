@@ -1,0 +1,26 @@
+services:
+  app:
+    build: .
+    container_name: inventory-app
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: db_inventory
+      DB_USERNAME: root
+      DB_PASSWORD: secret
+
+  db:
+    image: mysql:8.0
+    container_name: inventory-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: db_inventory
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_ALLOW_EMPTY_PASSWORD: "no"

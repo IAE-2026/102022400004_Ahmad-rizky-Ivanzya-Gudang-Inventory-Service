@@ -1,0 +1,66 @@
+Ekky Novriza Alam
+Tugas 2BBK2HAB3  - Integrasi Aplikasi Enterprise
+1
+Target Luaran
+BBK2HAB3
+Program Learning Outcomes (PLO) PRODI
+PLO01 Mampu menganalisis permasalahan infokom yang komplek, mendeﬁnisikan, dan memodelkan kebutuhan dalam konteks enterprise atau masyarakat 
+dengan menerapkan ilmu dan pengetahuan dalam bidang komputasi, teknologi informasi dan komunikasi, dan disiplin lain yang relevan
+PLO08
+Mampu menggunakan teknik, keahlian, atau kakas terkini yang diperlukan untuk menghasilkan solusi di bidang sistem informasi, baik dalam konteks 
+praktikum ataupun kasus nyata
+Course Learning Outcomes (CLO)
+Level Taksonomi Bloom PLO yang didukung
+PLO01-CLO03
+Mampu mengidentiﬁkasi kebutuhan sistem informasi dalam konteks enterprise atau 
+masyarakat Apply PLO01
+PLO08-CLO03
+Mampu menggunakan metode atau perangkat lunak tertentu dalam keilmuan sistem 
+informasi dalam konteks penelitian atau proyek nyata Apply PLO08
+Sub Course Learning Outcomes (SubCLO)
+SubCLO01
+Mampu mengidentiﬁkasi komponen sistem aplikasi enterprise dan menganalisis keterhubungan alur data serta proses bisnis antar aplikasi untuk 
+menentukan kebutuhan integrasi sistem.
+SubCLO02
+Mampu mengimplementasikan mekanisme integrasi data antar aplikasi enterprise sesuai kebutuhan sistem.
+Rincian Tugas Tengah Semester
+Deskripsi
+Anda diminta untuk membangun sebuah Mini-Service (misal: Service Katalog, Service User, atau Service Transaksi) yang nantinya akan 
+menjadi bagian dari ekosistem sistem kelompok Anda. Service ini harus bisa "berbicara" dengan sistem lain menggunakan protokol 
+komunikasi modern.
+Rubrikasi
+Kriteria Penilaian Bobot Indikator Keberhasilan
+Fungsionalitas REST 40% Endpoint berjalan lancar di Docker, status code tepat (200, 201, 404), 
+dan JSON valid.
+API Documentation 20% Swagger UI dapat diakses dan mencerminkan seluruh endpoint yang 
+tersedia.
+GraphQL Implementation 20% Berhasil melakukan query data melalui Playground dengan skema 
+yang tepat
+Security & Standard 10% Penggunaan API Key berfungsi
+Repository Proyek Harus dibuat pada organisasi yang disediakan oleh dosen
+Rincian Tugas 2
+Setiap mahasiswa wajib membuka akses data pada aplikasinya dengan 
+ketentuan: 
+•Endpoints: Minimal membuat 3 endpoint fungsional (Contoh: GET /api/v1/
+items, GET /api/v1/items/{id}, dan POST /api/v1/items). 
+•Format Respon: Wajib menggunakan format JSON yang konsisten. 
+•Security: Implementasikan pengamanan sederhana menggunakan API Key 
+yang dikirimkan melalui Request Header. 
+•Documentation: Wajib menyediakan dokumentasi interaktif menggunakan 
+Swagger/OpenAPI (Contoh: Menggunakan library L5-Swagger di Laravel). 
+•Ketentuan wajib mengikuti dokumen “Standard Integration Contract”
+Rincian Tugas 2 (cont.)
+Sebagai bentuk modernisasi integrasi, mahasiswa diminta untuk: 
+•Menginstalasi library GraphQL (Contoh: Lighthouse untuk Laravel). 
+•Membuat minimal 1 Query yang mampu mengambil data yang sama 
+dengan REST API namun dengan keleluasaan pemilihan field oleh klien. 
+•Menyediakan akses ke GraphQL Playground untuk pengujian.
+Evidence Tugas 2
+•Setiap mahasiswa wajib membuat repository pada organisasi yang 
+disiapkan oleh dosen 
+•Format penamaan repository: NIM_Nama-Service 
+•Deadline sesuai waktu di LMS 
+•Rekap log prompting dengan AI pada sebuah file dengan format .md pada 
+repository yang sama
+Terima kasih
+

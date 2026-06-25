@@ -1,0 +1,16 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+type Component {
+    id: ID!
+    name: String!
+    part_number: String!
+    stock: Int!
+    minimum_stock: Int!
+    unit: String!
+}
+
+type Query {
+    components: [Component!]! @all
+    component(id: ID! @eq): Component @find
+}
