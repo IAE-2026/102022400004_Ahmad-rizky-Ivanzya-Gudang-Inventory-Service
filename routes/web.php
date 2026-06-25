@@ -6,6 +6,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::redirect('/api/documentation', '/docs');
+
 // Manual route for GraphQL Playground (workaround for package auto-discovery issues in newer Laravel)
 Route::get('/graphql-playground', function () {
     return view('vendor.graphql-playground.index', [

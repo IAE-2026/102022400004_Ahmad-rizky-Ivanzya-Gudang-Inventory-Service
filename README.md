@@ -44,5 +44,5 @@ Proyek ini sudah di-dockerize menggunakan Docker Compose. Ikuti langkah berikut 
    ```
 
 ## Akses Pengujian
-- **Swagger UI:** `http://localhost:8000/api/documentation`
-- **GraphQL Playground:** `http://localhost:8000/graphql-playground`
+- **Swagger UI:** `http://localhost:8000/docs` (juga dialihkan dari `/api/documentation`)
+- **GraphQL Playground:** `http://localhost:8000/graphql-playground` (atau `/playground`)
