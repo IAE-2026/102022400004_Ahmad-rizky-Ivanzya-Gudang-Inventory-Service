@@ -351,6 +351,38 @@ class ComponentController extends Controller
             }
         }
 
+        if ($request->has('name') || $request->has('unit') || !$request->has('quantity')) {
+            if ($request->has('name') || $request->has('unit') || $request->has('minimum_stock')) {
+                $validated = $request->validate([
+                    'name' => 'required|string',
+                    'part_number' => 'required|string',
+                    'stock' => 'nullable|integer|min:0',
+                    'minimum_stock' => 'nullable|integer|min:0',
+                    'unit' => 'required|string',
+                ]);
+
+                $component = Component::updateOrCreate(
+                    ['part_number' => $validated['part_number']],
+                    [
+                        'name' => $validated['name'],
+                        'stock' => $validated['stock'] ?? 0,
+                        'minimum_stock' => $validated['minimum_stock'] ?? 0,
+                        'unit' => $validated['unit'],
+                    ]
+                );
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Component created successfully',
+                    'data' => $component,
+                    'meta' => [
+                        'service_name' => 'Inventory-Service',
+                        'api_version' => 'v1'
+                    ]
+                ], 201);
+            }
+        }
+
         $validated = $request->validate([
             'part_number' => 'required|string',
             'quantity' => 'required|integer|min:1',

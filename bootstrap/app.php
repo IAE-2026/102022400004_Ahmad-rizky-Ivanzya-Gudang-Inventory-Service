@@ -43,10 +43,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (ValidationException $e, $request) {
             if ($request->is('api/*') || $request->wantsJson()) {
+                $flatErrors = [];
+                foreach ($e->errors() as $messages) {
+                    foreach ($messages as $msg) {
+                        $flatErrors[] = $msg;
+                    }
+                }
                 return response()->json([
                     'status'  => 'error',
-                    'message' => $e->getMessage(),
-                    'errors'  => $e->errors(),
+                    'message' => 'The given data was invalid.',
+                    'errors'  => $flatErrors,
                 ], 422);
             }
         });
