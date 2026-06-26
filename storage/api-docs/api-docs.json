@@ -118,162 +118,13 @@
                         "ApiKeyAuth": []
                     }
                 ]
-            }
-        },
-        "/api/v1/components/{id}": {
-            "get": {
-                "tags": [
-                    "Components"
-                ],
-                "summary": "Get component by ID",
-                "operationId": "00e1acf939723039ebe48ff585c3a233",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Component ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "success"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Data retrieved successfully"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Processor Intel Core i7"
-                                                },
-                                                "part_number": {
-                                                    "type": "string",
-                                                    "example": "CPU-I7-12700"
-                                                },
-                                                "stock": {
-                                                    "type": "integer",
-                                                    "example": 15
-                                                },
-                                                "minimum_stock": {
-                                                    "type": "integer",
-                                                    "example": 5
-                                                },
-                                                "unit": {
-                                                    "type": "string",
-                                                    "example": "pcs"
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                },
-                                                "updated_at": {
-                                                    "type": "string",
-                                                    "format": "date-time"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "meta": {
-                                            "properties": {
-                                                "service_name": {
-                                                    "type": "string",
-                                                    "example": "Inventory-Service"
-                                                },
-                                                "api_version": {
-                                                    "type": "string",
-                                                    "example": "v1"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - API Key is missing or invalid",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "error"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthorized access, invalid or missing X-IAE-KEY"
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": null,
-                                            "nullable": true
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Component not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "string",
-                                            "example": "error"
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Component not found"
-                                        },
-                                        "errors": {
-                                            "type": "string",
-                                            "example": null,
-                                            "nullable": true
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/v1/components-receive": {
+            },
             "post": {
                 "tags": [
                     "Components"
                 ],
                 "summary": "Receive component stock",
-                "operationId": "22a9f15bc8118e1f9b4334796a350e83",
+                "operationId": "40b6ab57a69a4de943a56e28e4feaaba",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -449,6 +300,153 @@
                                                 }
                                             },
                                             "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/components/{id}": {
+            "get": {
+                "tags": [
+                    "Components"
+                ],
+                "summary": "Get component by ID",
+                "operationId": "00e1acf939723039ebe48ff585c3a233",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Component ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Data retrieved successfully"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Processor Intel Core i7"
+                                                },
+                                                "part_number": {
+                                                    "type": "string",
+                                                    "example": "CPU-I7-12700"
+                                                },
+                                                "stock": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "minimum_stock": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "unit": {
+                                                    "type": "string",
+                                                    "example": "pcs"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "service_name": {
+                                                    "type": "string",
+                                                    "example": "Inventory-Service"
+                                                },
+                                                "api_version": {
+                                                    "type": "string",
+                                                    "example": "v1"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - API Key is missing or invalid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized access, invalid or missing X-IAE-KEY"
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Component not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Component not found"
+                                        },
+                                        "errors": {
+                                            "type": "string",
+                                            "example": null,
+                                            "nullable": true
                                         }
                                     },
                                     "type": "object"

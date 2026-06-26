@@ -7,6 +7,8 @@ Route::get('/', function () {
 });
 
 Route::redirect('/api/documentation', '/docs');
+Route::redirect('/swagger-ui', '/docs');
+Route::redirect('/swagger-ui/', '/docs');
 
 // Manual route for GraphQL Playground (workaround for package auto-discovery issues in newer Laravel)
 Route::get('/graphql-playground', function () {

@@ -16,8 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-        'check.api.key' => \App\Http\Middleware\CheckApiKey::class,
-    ]);
+            'iae.key' => \App\Http\Middleware\CheckApiKey::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Standardize exception responses for API routes to IAE-T2 wrapper format

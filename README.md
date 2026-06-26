@@ -11,6 +11,7 @@ Service ini bertugas untuk mengelola data komponen/bahan baku (Gudang Bahan Baku
 
 ## Fungsionalitas Utama
 Service ini memiliki fungsionalitas berikut:
+
 1. **REST API (Minimum Viable API):**
    - `GET /api/v1/components` : Mengambil daftar seluruh komponen.
    - `GET /api/v1/components/{id}` : Mengambil data spesifik suatu komponen berdasarkan ID.

@@ -185,7 +185,7 @@ class ComponentController extends Controller
     }
 
     #[OA\Post(
-        path: "/api/v1/components-receive",
+        path: "/api/v1/components",
         summary: "Receive component stock",
         tags: ["Components"],
         security: [["ApiKeyAuth" => []]]
@@ -484,10 +484,9 @@ class ComponentController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Stock updated successfully',
-            'data' => [
-                'component' => $component,
+            'data' => array_merge($component->toArray(), [
                 'receipt_number' => $receiptNumber
-            ],
+            ]),
             'meta' => [
                 'service_name' => 'Inventory-Service',
                 'api_version' => 'v1'
