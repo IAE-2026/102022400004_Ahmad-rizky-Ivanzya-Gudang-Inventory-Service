@@ -10,7 +10,31 @@ Route::redirect('/swagger-ui', '/api/documentation');
 Route::redirect('/swagger-ui/', '/api/documentation');
 
 Route::get('/docs/api-docs.json', function () {
-    return response()->file(storage_path('api-docs/api-docs.json'), [
+    $path = storage_path('api-docs/api-docs.json');
+    if (!file_exists($path)) {
+        \Illuminate\Support\Facades\Artisan::call('l5-swagger:generate');
+    }
+    return response()->file($path, [
+        'Content-Type' => 'application/json'
+    ]);
+});
+
+Route::get('/openapi.json', function () {
+    $path = storage_path('api-docs/api-docs.json');
+    if (!file_exists($path)) {
+        \Illuminate\Support\Facades\Artisan::call('l5-swagger:generate');
+    }
+    return response()->file($path, [
+        'Content-Type' => 'application/json'
+    ]);
+});
+
+Route::get('/api-docs.json', function () {
+    $path = storage_path('api-docs/api-docs.json');
+    if (!file_exists($path)) {
+        \Illuminate\Support\Facades\Artisan::call('l5-swagger:generate');
+    }
+    return response()->file($path, [
         'Content-Type' => 'application/json'
     ]);
 });

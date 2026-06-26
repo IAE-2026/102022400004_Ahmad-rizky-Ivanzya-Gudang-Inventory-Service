@@ -21,39 +21,42 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Standardize exception responses for API routes to IAE-T2 wrapper format
-        $exceptions->render(function (NotFoundHttpException $e, $request) {
+        $exceptions->render(function (\Throwable $e, $request) {
             if ($request->is('api/*') || $request->wantsJson()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'Resource not found.',
-                    'errors'  => null,
-                ], 404);
-            }
-        });
+                $status = 500;
+                $message = $e->getMessage() ?: 'Internal server error.';
+                $errors = null;
 
-        $exceptions->render(function (MethodNotAllowedHttpException $e, $request) {
-            if ($request->is('api/*') || $request->wantsJson()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'Method not allowed.',
-                    'errors'  => null,
-                ], 405);
-            }
-        });
-
-        $exceptions->render(function (ValidationException $e, $request) {
-            if ($request->is('api/*') || $request->wantsJson()) {
-                $flatErrors = [];
-                foreach ($e->errors() as $messages) {
-                    foreach ($messages as $msg) {
-                        $flatErrors[] = $msg;
+                if ($e instanceof ValidationException) {
+                    $status = 422;
+                    $message = 'The given data was invalid.';
+                    $flatErrors = [];
+                    foreach ($e->errors() as $messages) {
+                        foreach ($messages as $msg) {
+                            $flatErrors[] = $msg;
+                        }
+                    }
+                    $errors = $flatErrors;
+                } elseif ($e instanceof NotFoundHttpException) {
+                    $status = 404;
+                    $message = 'Resource not found.';
+                } elseif ($e instanceof MethodNotAllowedHttpException) {
+                    $status = 405;
+                    $message = 'Method not allowed.';
+                } else {
+                    if (method_exists($e, 'getStatusCode')) {
+                        $status = $e->getStatusCode();
+                    } elseif (method_exists($e, 'getCode') && $e->getCode() >= 400 && $e->getCode() < 600) {
+                        $status = $e->getCode();
                     }
                 }
+
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'The given data was invalid.',
-                    'errors'  => $flatErrors,
-                ], 422);
+                    'message' => $message,
+                    'data'    => null,
+                    'errors'  => $errors,
+                ], $status);
             }
         });
     })->create();

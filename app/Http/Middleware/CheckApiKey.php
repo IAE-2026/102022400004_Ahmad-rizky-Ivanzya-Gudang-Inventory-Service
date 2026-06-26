@@ -21,6 +21,7 @@ class CheckApiKey
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Unauthorized. X-IAE-KEY header missing or invalid.',
+                'data'    => null,
                 'errors'  => null,
             ], 401);
         }
